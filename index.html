@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Tian Nian (粘天)</title>
+<meta name="keywords" content="Tian Nian, Nian Tian, 粘天, Tian-Nian, Shenzhen University, SZU, Embodied AI, Real Robot, control_your_robot, XPolicyLab, RoboTwin">
+<meta name="description" content="Personal academic homepage of Tian Nian (粘天), Algorithm Engineer working on real-robot Embodied AI." />
+<link rel="icon" href="assets/avatar/avatar.jpg">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f8f9fc;
+    --ink: #121317;
+    --ink-soft: #45474d;
+    --ink-faint: #7a7e87;
+    --line: #e6eaf0;
+    --line-soft: #eef1f5;
+    --accent: #0b57d0;
+    --accent-soft: #e8f0fe;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --font: 'Outfit', 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --shadow-soft: 0 18px 40px -24px rgba(18, 19, 23, .22);
+    --nav-h: 56px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 16px); overflow-x: clip; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+  }
+  body.nav-open { overflow: hidden; }
+  ::selection { background: var(--accent-soft); color: var(--accent); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  img, video { display: block; max-width: 100%; }
+  strong { font-weight: 600; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+  /* ============ NAV (progressive blur + fade) ============ */
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h); isolation: isolate; }
+  .nav-blur {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: calc(var(--nav-h) + 52px); z-index: -1; pointer-events: none; overflow: hidden;
+  }
+  .nav-blur-layer {
+    position: absolute; inset: 0;
+    backdrop-filter: blur(var(--nav-blur)); -webkit-backdrop-filter: blur(var(--nav-blur));
+    mask-repeat: no-repeat; mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat; -webkit-mask-size: 100% 100%;
+  }
+  .nav-blur-layer--1 { --nav-blur: 3px;  mask-image: linear-gradient(to bottom, transparent 38%, #000 58%, #000 70%, transparent 88%); -webkit-mask-image: linear-gradient(to bottom, transparent 38%, #000 58%, #000 70%, transparent 88%); }
+  .nav-blur-layer--2 { --nav-blur: 6px;  mask-image: linear-gradient(to bottom, transparent 18%, #000 36%, #000 52%, transparent 74%); -webkit-mask-image: linear-gradient(to bottom, transparent 18%, #000 36%, #000 52%, transparent 74%); }
+  .nav-blur-layer--3 { --nav-blur: 10px; mask-image: linear-gradient(to bottom, #000 28%, transparent 58%); -webkit-mask-image: linear-gradient(to bottom, #000 28%, transparent 58%); }
+  .nav-blur-layer--4 { --nav-blur: 16px; mask-image: linear-gradient(to bottom, #000 16%, transparent 42%); -webkit-mask-image: linear-gradient(to bottom, #000 16%, transparent 42%); }
+  .nav-blur-layer--5 { --nav-blur: 22px; mask-image: linear-gradient(to bottom, #000 0%, transparent 22%); -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 22%); }
+  .nav-blur-fade {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(255,255,255,.9) 0%, rgba(255,255,255,.55) 28%, rgba(255,255,255,.18) 52%, rgba(255,255,255,0) 78%);
+  }
+  .nav-inner {
+    position: relative; z-index: 1;
+    max-width: 1120px; margin: 0 auto; padding: 0 28px;
+    height: var(--nav-h); display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { font-size: 14.5px; font-weight: 500; letter-spacing: -.01em; color: var(--ink); line-height: 1.2; }
+  .nav-logo:hover { text-decoration: none; opacity: .7; }
+  .nav-toggle {
+    display: none; width: 42px; height: 42px; margin-right: -8px;
+    border: none; background: transparent; padding: 10px; cursor: pointer;
+    align-items: center; justify-content: center; border-radius: 10px; color: var(--ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-toggle:hover { background: var(--bg-soft); }
+  .nav-toggle-bars { display: block; width: 18px; height: 12px; position: relative; }
+  .nav-toggle-bars span {
+    position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor; border-radius: 1px;
+    transition: transform .25s ease, opacity .2s ease, top .25s ease;
+  }
+  .nav-toggle-bars span:nth-child(1) { top: 0; }
+  .nav-toggle-bars span:nth-child(2) { top: 5px; }
+  .nav-toggle-bars span:nth-child(3) { top: 10px; }
+  .nav.is-open .nav-toggle-bars span:nth-child(1) { top: 5px; transform: rotate(45deg); }
+  .nav.is-open .nav-toggle-bars span:nth-child(2) { opacity: 0; }
+  .nav.is-open .nav-toggle-bars span:nth-child(3) { top: 5px; transform: rotate(-45deg); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a {
+    position: relative; font-size: 13px; color: var(--ink-soft);
+    letter-spacing: .01em; transition: color .2s; padding: 6px 0;
+  }
+  .nav-links a:hover { color: var(--ink); text-decoration: none; }
+  .nav-links a::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 2px;
+    height: 1.5px; border-radius: 1px; background: var(--ink);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .25s cubic-bezier(.2,.7,.3,1);
+  }
+  .nav-links a:hover::after, .nav-links a.is-active::after { transform: scaleX(1); }
+  .nav-links a.is-active { color: var(--ink); }
+
+  /* ============ INTRO ============ */
+  .intro { padding: calc(var(--nav-h) + 44px) 0 56px; position: relative; overflow: hidden; }
+  .intro::before {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 82svh; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 70% at 12% 20%, rgba(11,87,208,.10), transparent 70%),
+      radial-gradient(40% 50% at 78% 10%, rgba(120,90,220,.08), transparent 70%),
+      linear-gradient(to bottom, transparent 70%, #fff 100%);
+  }
+  .intro .wrap { position: relative; z-index: 1; }
+  .intro-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 30%); gap: 28px 40px; align-items: center; }
+  .intro-copy { display: flex; flex-direction: column; min-width: 0; }
+  .intro h1 { margin-top: 10px; font-size: clamp(38px, 4.8vw, 56px); font-weight: 400; line-height: 1.05; letter-spacing: -.035em; }
+  .intro h1 .cn { font-size: .55em; font-weight: 300; letter-spacing: .02em; color: var(--ink-faint); }
+  .intro-roles { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: stretch; row-gap: 10px; }
+  .intro-roles .role { display: flex; flex-direction: column; gap: 3px; padding: 0 18px; border-left: 1px solid var(--line); min-width: 0; }
+  .intro-roles .role:first-child { padding-left: 0; border-left: none; }
+  .intro-roles .role-title { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); line-height: 1.3; }
+  .intro-roles .role a, .intro-roles .role span.role-name { font-size: 14.5px; font-weight: 500; color: var(--ink); letter-spacing: -.015em; line-height: 1.3; }
+  .intro-roles .role a:hover { color: var(--accent); text-decoration: none; }
+  .intro-lead { margin: 34px 0 22px; font-size: clamp(22px, 2.8vw, 32px); font-weight: 300; letter-spacing: -.025em; line-height: 1.25; }
+  .intro-lead em { font-style: normal; font-weight: 500; }
+  .intro-bio { font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+  .intro-bio strong { color: var(--ink); }
+  .intro-tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .intro-tags span {
+    font-size: 12px; font-weight: 500; color: var(--ink-soft);
+    padding: 3px 10px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .intro-actions { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .intro-actions a { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--ink-soft); transition: color .2s; }
+  .intro-actions a:hover { color: var(--ink); text-decoration: none; }
+  .intro-actions a img { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+  .intro details { margin-top: 16px; }
+  .intro summary {
+    cursor: pointer; font-size: 11.5px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); user-select: none; transition: color .2s; list-style: none;
+  }
+  .intro summary::-webkit-details-marker { display: none; }
+  .intro summary::before { content: '+ '; color: var(--accent); }
+  .intro details[open] summary::before { content: '– '; }
+  .intro summary:hover { color: var(--ink); }
+  .bio-detail { margin-top: 12px; font-size: 13px; line-height: 1.75; color: var(--ink-soft); }
+  .bio-detail p + p { margin-top: 8px; }
+  .bio-detail strong { color: var(--ink); }
+  .intro-portrait {
+    width: 100%; aspect-ratio: 1 / 1; border-radius: 22px; overflow: hidden;
+    background: var(--bg-soft); box-shadow: 0 0 0 1px var(--line), var(--shadow-soft);
+  }
+  .intro-portrait img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s cubic-bezier(.2,.7,.3,1); }
+  .intro-portrait:hover img { transform: scale(1.03); }
+  .avatar-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 300; color: var(--ink-faint); }
+
+  /* ============ SECTIONS ============ */
+  section.block { padding: 48px 0; }
+  section.block.soft { background: var(--bg-soft); }
+  .sec-head { margin-bottom: 20px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .sec-title { font-size: clamp(28px, 3.4vw, 40px); font-weight: 400; letter-spacing: -.035em; line-height: 1.08; }
+  .scholar-link { font-size: 13px; font-weight: 500; white-space: nowrap; }
+
+  /* ============ NEWS ============ */
+  .news-list { list-style: none; border-top: 1px solid var(--line); }
+  .news-item { display: grid; grid-template-columns: 72px 1fr; gap: 14px; padding: 7px 0; border-bottom: 1px solid var(--line-soft); align-items: baseline; }
+  .news-date { font-size: 12px; font-weight: 500; color: var(--ink-faint); letter-spacing: .02em; }
+  .news-content { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .news-content strong { color: var(--ink); }
+
+  /* ============ EXPERIENCE / EDUCATION ============ */
+  .row-list { list-style: none; border-top: 1px solid var(--line); }
+  .row-item {
+    display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; column-gap: 22px;
+    align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .row-item:last-child { border-bottom: none; }
+  .row-logo {
+    width: 64px; height: 64px; border-radius: 14px; background: #fff;
+    box-shadow: 0 0 0 1px var(--line); display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; color: var(--accent); letter-spacing: .02em; overflow: hidden;
+  }
+  .row-logo img { max-width: 80%; max-height: 80%; object-fit: contain; }
+  .row-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .row-org { font-size: 17px; font-weight: 500; letter-spacing: -.015em; }
+  .row-org a { color: var(--accent); }
+  .row-role { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .row-sub { font-size: 13px; color: var(--ink-faint); }
+  .row-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; }
+  .row-period, .row-place { font-size: 12.5px; font-weight: 500; letter-spacing: .04em; color: var(--ink-faint); white-space: nowrap; }
+  .row-place { font-weight: 400; letter-spacing: 0; }
+
+  /* ============ PUB SPOTLIGHT ============ */
+  .pub-spotlight {
+    border-radius: var(--radius-lg); background: #fff; padding: 12px 16px; margin-bottom: 18px;
+    box-shadow: inset 0 0 0 1px var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px;
+  }
+  .pub-spotlight-col-title {
+    font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint);
+    padding-bottom: 6px; border-bottom: 1px solid var(--line);
+  }
+  .pub-spotlight-list { list-style: none; }
+  .pub-spotlight-row { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--line-soft); font-size: 12.5px; line-height: 1.35; }
+  .pub-spotlight-row:last-child { border-bottom: none; }
+  .spotlight-venue-tag { flex: 0 0 auto; white-space: nowrap; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--accent); }
+  .spotlight-papers-inline { color: var(--ink-soft); min-width: 0; }
+  .spotlight-papers-inline a { color: inherit; text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+  .spotlight-papers-inline a:hover { color: var(--ink); }
+
+  /* ============ PUB FEATURED ============ */
+  .pub-featured { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .pub-featured-item { display: flex; flex-direction: column; gap: 12px; }
+  .pub-featured-media {
+    border: none; border-radius: 16px; overflow: hidden; background: #fff; cursor: pointer;
+    padding: 0; position: relative; width: 100%; aspect-ratio: 16 / 9;
+    transition: transform .45s cubic-bezier(.2,.7,.3,1), box-shadow .45s;
+    box-shadow: 0 0 0 1px rgba(11,18,32,.08); font: inherit; appearance: none; -webkit-appearance: none; display: block;
+  }
+  .pub-featured-media:hover { transform: translateY(-4px); box-shadow: var(--shadow-soft); }
+  .pub-featured-media video, .pub-featured-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .pub-featured-media img { object-fit: contain; }
+  .pub-featured-play-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(11,18,32,0); transition: background .25s ease; }
+  .pub-featured-play-hint::after {
+    content: '↗'; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.94); color: var(--ink);
+    font-size: 16px; font-weight: 500; line-height: 44px; text-align: center; box-shadow: 0 8px 24px rgba(11,18,32,.2);
+    opacity: 0; transform: scale(.88); transition: all .25s ease;
+  }
+  .pub-featured-media:hover .pub-featured-play-hint { background: rgba(11,18,32,.18); }
+  .pub-featured-media:hover .pub-featured-play-hint::after { opacity: 1; transform: scale(1); }
+  .pub-featured-label { font-size: 14px; font-weight: 500; letter-spacing: -.01em; color: var(--ink); }
+  .pub-featured-label:hover { color: var(--accent); text-decoration: none; }
+
+  /* ============ PUB LIST ============ */
+  .pub-group { margin-top: 36px; }
+  .pub-group-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 6px 0 12px; margin-bottom: 4px; border-bottom: 2px solid var(--ink); }
+  .pub-group-title { font-size: clamp(22px, 2.4vw, 28px); font-weight: 500; letter-spacing: -.025em; line-height: 1.15; }
+  .pub-group-meta { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .pub-list { list-style: none; }
+  .pub-item { display: grid; grid-template-columns: 160px 1fr; gap: 18px; padding: 14px 10px; border-bottom: 1px solid var(--line-soft); align-items: center; }
+  .pub-item--lead {
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+    box-shadow: inset 2px 0 0 color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .pub-item--lead:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  .pub-thumb { width: 160px; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--line); }
+  .pub-thumb img, .pub-thumb video { width: 160px; height: auto; object-fit: contain; }
+  .pub-title { font-size: 16px; font-weight: 500; letter-spacing: -.015em; line-height: 1.3; }
+  .pub-authors { font-size: 12.5px; color: var(--ink-faint); margin-top: 3px; line-height: 1.45; }
+  .pub-authors .self { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent); }
+  .pub-authors .authors-ellipsis { letter-spacing: .06em; user-select: none; }
+  .pub-authors-detail-btn {
+    display: inline; margin-left: 6px; padding: 0; border: none; background: none;
+    font: inherit; font-size: 12px; font-weight: 500; color: var(--ink); cursor: pointer; white-space: nowrap;
+  }
+  .pub-authors-detail-btn:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .pub-venue, .pub-award { margin-top: 4px; font-size: 11.5px; line-height: 1.35; }
+  .pub-venue { color: var(--ink-soft); }
+  .pub-award { color: var(--ink); font-weight: 500; }
+  .venue-name { font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
+  .venue-rank { font-weight: 600; letter-spacing: .04em; color: var(--ink-faint); }
+  .award-hl { color: #c62828; font-weight: 600; }
+  .pub-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 0; margin-top: 6px; }
+  .pub-link {
+    font-size: 12.5px; font-weight: 500; padding: 0 10px 0 0; color: var(--ink);
+    text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--ink) 22%, transparent);
+    text-underline-offset: 3px; text-decoration-thickness: 1px; transition: text-decoration-color .15s ease;
+  }
+  .pub-link + .pub-link { padding-left: 10px; border-left: 1px solid var(--line); }
+  .pub-link:hover { text-decoration-color: var(--ink); }
+  .pub-footnote { margin-top: 16px; font-size: 12px; color: var(--ink-faint); }
+
+  /* ============ LIGHTBOX ============ */
+  .pub-lightbox { position: fixed; inset: 0; z-index: 200; display: none; }
+  .pub-lightbox.is-open { display: flex; align-items: center; justify-content: center; }
+  .pub-lightbox-backdrop { position: absolute; inset: 0; background: rgba(18,19,23,.82); backdrop-filter: blur(12px); }
+  .pub-lightbox-dialog { position: relative; z-index: 1; max-width: min(1080px, 92vw); max-height: 88vh; display: flex; flex-direction: column; gap: 12px; }
+  .pub-lightbox-stage { border-radius: var(--radius-lg); overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
+  .pub-lightbox-stage video, .pub-lightbox-stage img { max-width: 100%; max-height: 76vh; object-fit: contain; }
+  .pub-lightbox-caption { color: #e8e6e2; font-size: 13px; text-align: center; }
+  .pub-lightbox-close {
+    position: absolute; top: -46px; right: 0; width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08); color: #fff; font-size: 18px; cursor: pointer; font-family: var(--font);
+  }
+  .pub-lightbox-close:hover { background: rgba(255,255,255,.22); }
+
+  /* ============ OPEN SOURCE ============ */
+  .oss-list { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
+  .oss-item { display: flex; flex-direction: column; gap: 8px; padding: 22px 28px 22px 0; }
+  .oss-item + .oss-item { padding-left: 28px; border-left: 1px solid var(--line); }
+  .proj-name { font-size: 16px; font-weight: 500; letter-spacing: -.015em; }
+  .proj-name a { color: var(--ink); }
+  .proj-name a:hover { color: var(--accent); text-decoration: none; }
+  .proj-meta { font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .proj-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+  .oss-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .oss-badges img { height: 20px; }
+
+  /* ============ FOOTER ============ */
+  footer { padding: 28px 0 36px; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-faint); }
+  .footer-inner a { color: var(--ink-faint); }
+  .footer-inner a:hover { color: var(--accent); text-decoration: none; }
+  .footer-inner img { height: 17px; }
+
+  /* ============ REVEAL ============ */
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .8s cubic-bezier(.2,.7,.3,1), transform .8s cubic-bezier(.2,.7,.3,1); }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-d1 { transition-delay: .08s; }
+  .reveal-d2 { transition-delay: .16s; }
+  .reveal-d3 { transition-delay: .24s; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 960px) {
+    .wrap, .nav-inner { padding: 0 22px; }
+    .intro-grid { grid-template-columns: minmax(0, 1fr) minmax(200px, 32%); gap: 22px 24px; }
+    .pub-featured { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .oss-list { grid-template-columns: 1fr; }
+    .oss-item, .oss-item + .oss-item { padding: 18px 0; border-left: none; border-bottom: 1px solid var(--line-soft); }
+  }
+  @media (max-width: 860px) {
+    .nav-toggle { display: inline-flex; }
+    .nav-links {
+      display: none; position: absolute; top: var(--nav-h); left: 0; right: 0;
+      flex-direction: column; align-items: stretch; gap: 0; padding: 8px 18px 18px;
+      background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav.is-open .nav-links { display: flex; }
+    .nav-links a { padding: 12px 4px; font-size: 15px; border-bottom: 1px solid var(--line-soft); }
+    .nav-links a::after { display: none; }
+  }
+  @media (max-width: 720px) {
+    .intro-grid { grid-template-columns: 1fr; }
+    .intro-side { order: -1; max-width: 200px; }
+    .pub-spotlight { grid-template-columns: 1fr; }
+    .pub-featured { grid-template-columns: 1fr; }
+    .pub-item { grid-template-columns: 1fr; }
+    .pub-thumb, .pub-thumb img, .pub-thumb video { width: 100%; }
+    .row-item { grid-template-columns: 48px minmax(0, 1fr); row-gap: 6px; }
+    .row-logo { width: 48px; height: 48px; font-size: 13px; }
+    .row-side { grid-column: 2; align-items: flex-start; text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav class="nav" id="nav">
+  <div class="nav-blur" aria-hidden="true">
+    <div class="nav-blur-layer nav-blur-layer--1"></div>
+    <div class="nav-blur-layer nav-blur-layer--2"></div>
+    <div class="nav-blur-layer nav-blur-layer--3"></div>
+    <div class="nav-blur-layer nav-blur-layer--4"></div>
+    <div class="nav-blur-layer nav-blur-layer--5"></div>
+    <div class="nav-blur-fade"></div>
+  </div>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#about">Tian Nian (粘天)</a>
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+      <span class="nav-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <div class="nav-links" id="nav-links">
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+      <a href="#experience">Experience</a>
+      <a href="#publications">Publications</a>
+      <a href="#opensource">Open Source</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= INTRO ================= -->
+<header class="intro" id="about">
+  <div class="wrap">
+    <div class="intro-grid">
+      <div class="intro-copy">
+        <h1 class="reveal reveal-d1">Tian Nian <span class="cn">(粘天)</span></h1>
+
+        <p class="intro-roles reveal reveal-d2">
+          <span class="role">
+            <span class="role-title">Algorithm Engineer</span>
+            <a href="https://xsparkai.com/" target="_blank">Xspark AI (无界智航)</a>
+          </span>
+          <span class="role">
+            <span class="role-title">B.Eng.</span>
+            <a href="https://www.szu.edu.cn/" target="_blank">Shenzhen University</a>
+          </span>
+          <span class="role">
+            <span class="role-title">Creator</span>
+            <a href="https://github.com/Tian-Nian/control_your_robot" target="_blank">control_your_robot</a>
+          </span>
+        </p>
+
+        <p class="intro-lead reveal reveal-d2">
+          Bringing Robot Learning into the <em>Real World</em>
+        </p>
+
+        <p class="intro-bio reveal reveal-d3">
+          Algorithm Engineer at <a href="https://xsparkai.com/" target="_blank">Xspark AI</a> (无界智航), Shenzhen. B.Eng. in Software Engineering (Tencent Class) from <a href="https://www.szu.edu.cn/" target="_blank">Shenzhen University</a>.
+          Research on <strong>real-robot Embodied AI</strong>, covering robot control, data collection, and policy deployment on physical hardware.
+          Creator of <a href="https://github.com/Tian-Nian/control_your_robot" target="_blank">control_your_robot</a>,
+          core lead author of <a href="https://xpolicylab.github.io/" target="_blank">XPolicyLab</a> (<strong>IROS 2026 Best Tool Paper Award</strong>),
+          and contributor to <a href="https://robotwin-platform.github.io/" target="_blank">RoboTwin 2.0</a> (<strong>ICML 2026</strong>).
+        </p>
+
+        <div class="intro-tags reveal reveal-d3">
+          <span>Real-Robot Manipulation</span>
+          <span>Teleoperation &amp; Data Collection</span>
+          <span>VLA Deployment</span>
+          <span>Sim2Real</span>
+        </div>
+
+        <div class="intro-actions reveal reveal-d3">
+          <a href="mailto:niantianwork@gmail.com"><img src="assets/icon/email.png" alt="" /> Email</a>
+          <a href="https://scholar.google.com/citations?user=V555uv8AAAAJ&hl=zh-CN" target="_blank"><img src="assets/icon/google_scholar.png" alt="" /> Scholar</a>
+          <a href="https://github.com/Tian-Nian" target="_blank"><img src="assets/icon/github.svg" alt="" /> GitHub</a>
+          <a href="assets/icon/my_wechat.jpg" target="_blank"><img src="assets/icon/wechat.png" alt="" /> WeChat</a>
+        </div>
+
+        <details class="reveal reveal-d3">
+          <summary>Detailed Profile (详细个人介绍)</summary>
+          <div class="bio-detail">
+            <p>
+              Hi! I am <strong>Tian Nian (Chinese name: 粘天)</strong>, an Algorithm Engineer at <a href="https://xsparkai.com/" target="_blank">Xspark AI</a> (无界智航) in Shenzhen.
+              I received my B.Eng. in Software Engineering (Tencent Class) from <a href="https://www.szu.edu.cn/" target="_blank">Shenzhen University</a> in 2025,
+              and was a research intern at <a href="https://www.shlab.org.cn/" target="_blank">Shanghai AI Laboratory</a> from Mar. 2025 to Sep. 2025.
+              My work focuses on <strong>real-robot Embodied AI</strong>: building the systems that connect robot hardware, teleoperation,
+              data pipelines, and learned policies, so that research models can actually run on physical robots.
+            </p>
+            <p>
+              I created <a href="https://github.com/Tian-Nian/control_your_robot" target="_blank">control_your_robot</a>, an open-source pipeline
+              covering robotic arm control, data collection, and VLA training and deployment. I am a core lead author of
+              <a href="https://xpolicylab.github.io/" target="_blank">XPolicyLab</a>, which received the <strong>Best Tool Paper Award</strong> at the
+              IROS 2026 ScaleInfra Workshop, and a contributor to <a href="https://robotwin-platform.github.io/" target="_blank">RoboTwin 2.0</a> (ICML 2026).
+            </p>
+            <p>
+              你好！我是<strong>粘天 (English name: Tian Nian)</strong>，2025 年本科毕业于<a href="https://www.szu.edu.cn/" target="_blank">深圳大学</a>软件工程（腾讯班），
+              曾于 2025.03—2025.09 在<a href="https://www.shlab.org.cn/" target="_blank">上海人工智能实验室</a>实习，现任<a href="https://xsparkai.com/" target="_blank">无界智航 (Xspark AI)</a> 算法工程师，研究方向为<strong>具身智能真机方向</strong>，关注机器人控制、遥操作数据采集与策略的真机部署。
+              我是开源项目 <a href="https://github.com/Tian-Nian/control_your_robot" target="_blank">control_your_robot</a> 的作者，
+              <a href="https://xpolicylab.github.io/" target="_blank">XPolicyLab</a> 核心作者之一（IROS 2026 ScaleInfra Workshop 最佳工具论文奖），
+              并参与了 <a href="https://robotwin-platform.github.io/" target="_blank">RoboTwin 2.0</a>（ICML 2026）的研发。
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <aside class="intro-side reveal reveal-d2">
+        <div class="intro-portrait">
+          <img src="assets/avatar/avatar.jpg" alt="Tian Nian"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+          <div class="avatar-placeholder" style="display:none;">TN</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NEWS ================= -->
+<section class="block soft" id="news">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 class="sec-title">News</h2>
+    </div>
+    <ul class="news-list reveal">
+      <li class="news-item">
+        <span class="news-date">10/2026</span>
+        <span class="news-content"><a href="https://xpolicylab.github.io/" target="_blank">XPolicyLab</a> received <strong>Best Tool Paper Award</strong> at <strong>IROS 2026 ScaleInfra Workshop</strong> !</span>
+      </li>
+      <li class="news-item">
+        <span class="news-date">08/2026</span>
+        <span class="news-content">We released <a href="https://arxiv.org/abs/2608.09892" target="_blank">XPolicyLab</a>, a unified standard and open ecosystem for robot policy evaluation and deployment, integrating 60+ policies !</span>
+      </li>
+      <li class="news-item">
+        <span class="news-date">07/2026</span>
+        <span class="news-content"><a href="https://github.com/Tian-Nian/control_your_robot" target="_blank">control_your_robot</a> now supports XPolicyLab real-robot deployment and offline replay evaluation !</span>
+      </li>
+      <li class="news-item">
+        <span class="news-date">2026</span>
+        <span class="news-content">RoboTwin 2.0 and Discrete Diffusion VLA are accepted to <strong>ICML 2026</strong> !</span>
+      </li>
+      <li class="news-item">
+        <span class="news-date">10/2025</span>
+        <span class="news-content">We released <a href="https://arxiv.org/abs/2510.14300" target="_blank">AdaMoE</a>, an action-specialized Mixture-of-Experts architecture for VLA learning.</span>
+      </li>
+      <li class="news-item">
+        <span class="news-date">09/2025</span>
+        <span class="news-content">Released the technical report of <a href="https://arxiv.org/abs/2509.23823" target="_blank">Control Your Robot</a>, a unified system for robot control and policy deployment !</span>
+      </li>
+      <li class="news-item">
+        <span class="news-date">06/2025</span>
+        <span class="news-content">We released <a href="https://robotwin-platform.github.io/" target="_blank">RoboTwin 2.0</a>, a scalable data generator and benchmark for bimanual manipulation !</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= EXPERIENCE & EDUCATION ================= -->
+<section class="block" id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 class="sec-title">Experience &amp; Education</h2>
+    </div>
+    <ul class="row-list reveal">
+      <li class="row-item">
+        <div class="row-logo">Xspark</div>
+        <div class="row-main">
+          <div class="row-org"><a href="https://xsparkai.com/" target="_blank">Xspark AI</a> (无界智航)</div>
+          <div class="row-role">Algorithm Engineer — Real-Robot Embodied AI</div>
+          <div class="row-sub">Robot control, data collection systems, and policy deployment on physical robots.</div>
+        </div>
+        <div class="row-side">
+          <div class="row-period">Present</div>
+          <div class="row-place">Shenzhen</div>
+        </div>
+      </li>
+      <li class="row-item">
+        <div class="row-logo">AI Lab</div>
+        <div class="row-main">
+          <div class="row-org"><a href="https://www.shlab.org.cn/" target="_blank">Shanghai AI Laboratory</a></div>
+          <div class="row-role">Research Intern — Embodied AI</div>
+        </div>
+        <div class="row-side">
+          <div class="row-period">Mar. 2025 — Sep. 2025</div>
+          <div class="row-place">Shanghai</div>
+        </div>
+      </li>
+      <li class="row-item">
+        <div class="row-logo">SZU</div>
+        <div class="row-main">
+          <div class="row-org"><a href="https://www.szu.edu.cn/" target="_blank">Shenzhen University (SZU)</a></div>
+          <div class="row-role">B.Eng. in Software Engineering (Tencent Class)</div>
+        </div>
+        <div class="row-side">
+          <div class="row-period">Sep. 2021 — Jul. 2025</div>
+          <div class="row-place">Shenzhen</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= PUBLICATIONS ================= -->
+<section class="block soft" id="publications">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 class="sec-title">Publications</h2>
+      <a class="scholar-link" href="https://scholar.google.com/citations?user=V555uv8AAAAJ&hl=zh-CN" target="_blank">Google Scholar →</a>
+    </div>
+
+    <div class="pub-spotlight reveal">
+      <div>
+        <div class="pub-spotlight-col-title">Accepted Papers</div>
+        <ul class="pub-spotlight-list">
+          <li class="pub-spotlight-row">
+            <span class="spotlight-venue-tag">ICML × 2</span>
+            <span class="spotlight-papers-inline">
+              <a href="https://robotwin-platform.github.io/" target="_blank">RoboTwin 2.0</a>,
+              <a href="https://arxiv.org/abs/2508.20072" target="_blank">Discrete Diffusion VLA</a>
+            </span>
+          </li>
+          <li class="pub-spotlight-row">
+            <span class="spotlight-venue-tag">Tech Report</span>
+            <span class="spotlight-papers-inline">
+              <a href="https://robotwin-benchmark.github.io/cvpr-2025-challenge/" target="_blank">RoboTwin Challenge @ CVPR 2025 MEIS</a>
+            </span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <div class="pub-spotlight-col-title">Awards</div>
+        <ul class="pub-spotlight-list">
+          <li class="pub-spotlight-row">
+            <span class="spotlight-venue-tag">Best Tool Paper</span>
+            <span class="spotlight-papers-inline">
+              <a href="https://xpolicylab.github.io/" target="_blank">XPolicyLab</a> @ IROS 2026 ScaleInfra
+            </span>
+          </li>
+          <li class="pub-spotlight-row">
+            <span class="spotlight-venue-tag">Best Poster</span>
+            <span class="spotlight-papers-inline">
+              <a href="https://robotwin-platform.github.io/" target="_blank">RoboTwin 2.0</a> @ IROS 2025 RoDGE;
+              ChinaSI 2025 Outstanding Poster (rk 1st)
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pub-featured reveal">
+      <div class="pub-featured-item">
+        <button type="button" class="pub-featured-media pub-featured-trigger"
+                data-media-type="video" data-src="assets/work/2026-xpolicylab.mp4" data-playback-rate="3.0"
+                data-caption="XPolicyLab" aria-label="Play XPolicyLab demo">
+          <video src="assets/work/2026-xpolicylab.mp4" muted loop autoplay playsinline preload="metadata"
+                 onloadedmetadata="this.playbackRate=3.0"></video>
+          <span class="pub-featured-play-hint" aria-hidden="true"></span>
+        </button>
+        <a class="pub-featured-label" href="https://xpolicylab.github.io/" target="_blank" rel="noopener noreferrer">XPolicyLab (IROS 2026 Best Tool Paper)</a>
+      </div>
+      <div class="pub-featured-item">
+        <button type="button" class="pub-featured-media pub-featured-trigger"
+                data-media-type="video" data-src="assets/work/2025-robotwin2.0.mp4" data-playback-rate="3.0"
+                data-caption="RoboTwin 2.0" aria-label="Play RoboTwin 2.0 demo">
+          <video src="assets/work/2025-robotwin2.0.mp4" muted loop autoplay playsinline preload="metadata"
+                 onloadedmetadata="this.playbackRate=3.0"></video>
+          <span class="pub-featured-play-hint" aria-hidden="true"></span>
+        </button>
+        <a class="pub-featured-label" href="https://robotwin-platform.github.io/" target="_blank" rel="noopener noreferrer">RoboTwin 2.0 (ICML 2026)</a>
+      </div>
+      <div class="pub-featured-item">
+        <button type="button" class="pub-featured-media pub-featured-trigger"
+                data-media-type="image" data-src="assets/work/cyr.jpg"
+                data-caption="Control Your Robot" aria-label="View Control Your Robot system overview">
+          <img src="assets/work/cyr.jpg" alt="Control Your Robot system overview" />
+          <span class="pub-featured-play-hint" aria-hidden="true"></span>
+        </button>
+        <a class="pub-featured-label" href="https://github.com/Tian-Nian/control_your_robot" target="_blank" rel="noopener noreferrer">Control Your Robot (First Author)</a>
+      </div>
+    </div>
+
+    <div class="pub-lightbox" id="pub-lightbox" aria-hidden="true">
+      <div class="pub-lightbox-backdrop" data-close></div>
+      <div class="pub-lightbox-dialog" role="dialog" aria-modal="true">
+        <button type="button" class="pub-lightbox-close" data-close aria-label="Close">×</button>
+        <div class="pub-lightbox-stage" id="pub-lightbox-stage"></div>
+        <div class="pub-lightbox-caption" id="pub-lightbox-caption"></div>
+      </div>
+    </div>
+
+    <!-- 第一作者 / 核心作者 -->
+    <div class="pub-group reveal">
+      <div class="pub-group-head">
+        <h3 class="pub-group-title">Real-Robot Systems &amp; Infra</h3>
+        <span class="pub-group-meta">First / Core Lead Author</span>
+      </div>
+      <ul class="pub-list">
+        <li class="pub-item">
+          <div class="pub-thumb"><img src="assets/work/cyr.jpg" alt="Control Your Robot" loading="lazy" /></div>
+          <div class="pub-body">
+            <div class="pub-title">Control Your Robot: A Unified System for Robot Control and Policy Deployment</div>
+            <div class="pub-authors"><span class="self">Tian Nian</span>, Weijie Ke, Shaolong Zhu, Bingshan Hu</div>
+            <div class="pub-venue"><span class="venue-name">arXiv 2025</span> <span class="venue-rank">· Preprint</span></div>
+            <div class="pub-links">
+              <a class="pub-link" href="https://arxiv.org/pdf/2509.23823" target="_blank">Paper</a>
+              <a class="pub-link" href="https://arxiv.org/abs/2509.23823" target="_blank">arXiv</a>
+              <a class="pub-link" href="https://github.com/Tian-Nian/control_your_robot" target="_blank">Code</a>
+            </div>
+          </div>
+        </li>
+        <li class="pub-item">
+          <div class="pub-thumb">
+            <video src="assets/work/2026-xpolicylab.mp4" autoplay loop muted playsinline onloadedmetadata="this.playbackRate=3.0"></video>
+          </div>
+          <div class="pub-body">
+            <div class="pub-title">XPolicyLab: A Unified Standard and Open Ecosystem for Robot Policy Evaluation and Deployment</div>
+            <div class="pub-authors">Tianxing Chen*§, Yue Chen*, <span class="self">Tian Nian*</span>, Zijian Cai*, Guangyu Chen*, Wenwei Lin*, Qiwei Liang*, Zanxin Chen*, Peicheng Xiang, Kailun Su, Zixuan Li, Junyuan Tang, Yan Qin, Qiangyu Chen, Shaolong Zhu, Tengyue Jiang, Yiqing Wang, Xiang Li, Jiahao Zhang, Weijie Wan, Baijun Chen, Honghao Su, Kehe Ye, Shujia Liu, Kaixuan Wang, Haotian Liang, Yunze Liu, Mingleyang Li, Yuran Wang, Boyu Chen, Hongzhe Bi, Shuhe Huang, Hengkai Tan, Jisong Cai, Yao Mu, Jun Guo, Xiaofeng Wang, Zheng Zhu, Weijie Ke, Hengtao Li, Yuhang Tang, Xiaofan Li, Ganlin Yang, Zhangzheng Tu, Shuai Yang, Wenxuan Song, Pengxiang Ding, Kaidong Zhang, Yu Sun, Junliang Guo, Tong Zhang, Yixing Chen, Rongxu Cui, Zongzheng Zhang, Haoxiang Ma, Junhao Cai, Haoyu Zhang, Senqiao Yang, Jinhui Ye, Pengguang Chen, Shu Liu, Xiu Su, Wenhan Fang, Wenhao Li, Yichao Cao, Chengyao Wang, Qiang Chen, Ping Luo†, Wenbo Ding†</div>
+            <div class="pub-award">IEEE IROS 2026 ScaleInfra Workshop <span class="award-hl">Best Tool Paper Award</span></div>
+            <div class="pub-links">
+              <a class="pub-link" href="https://xpolicylab.github.io/" target="_blank">Project Page</a>
+              <a class="pub-link" href="https://arxiv.org/pdf/2608.09892" target="_blank">Paper</a>
+              <a class="pub-link" href="https://arxiv.org/abs/2608.09892" target="_blank">arXiv</a>
+              <a class="pub-link" href="https://github.com/XPolicyLab/XPolicyLab" target="_blank">Code</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 合作论文 -->
+    <div class="pub-group reveal">
+      <div class="pub-group-head">
+        <h3 class="pub-group-title">Benchmarks &amp; Policies</h3>
+        <span class="pub-group-meta">Co-author</span>
+      </div>
+      <ul class="pub-list">
+        <li class="pub-item">
+          <div class="pub-thumb">
+            <video src="assets/work/2025-robotwin2.0.mp4" autoplay loop muted playsinline onloadedmetadata="this.playbackRate=3.0"></video>
+          </div>
+          <div class="pub-body">
+            <div class="pub-title">RoboTwin 2.0: A Scalable Data Generator and Benchmark with Strong Domain Randomization for Robust Bimanual Robotic Manipulation</div>
+            <div class="pub-authors">Tianxing Chen*, Zanxin Chen*, Baijun Chen*, Zijian Cai*, Yibin Liu*, Zixuan Li*, Qiwei Liang, Xianliang Lin, Yiheng Ge, Zhenyu Gu, Weiliang Deng, Yubin Guo, <span class="self">Tian Nian</span>, Xuanbing Xie, Qiangyu Chen, Kailun Su, Tianling Xu, Guodong Liu, Mengkang Hu, Huan-ang Gao, Kaixuan Wang, Zhixuan Liang, Yusen Qin, Xiaokang Yang, Ping Luo†, Yao Mu†</div>
+            <div class="pub-venue"><span class="venue-name">ICML 2026</span> <span class="venue-rank">CCF-A</span></div>
+            <div class="pub-award">ModelScope Top 10 Open-Source Project of 2025 · IROS 2025 RoboGen Workshop Best Paper Finalist · RoDGE Workshop <span class="award-hl">Best Poster Award</span></div>
+            <div class="pub-links">
+              <a class="pub-link" href="https://robotwin-platform.github.io/" target="_blank">Project Page</a>
+              <a class="pub-link" href="https://robotwin-platform.github.io/leaderboard" target="_blank">Leaderboard</a>
+              <a class="pub-link" href="https://arxiv.org/abs/2506.18088" target="_blank">arXiv</a>
+              <a class="pub-link" href="https://github.com/RoboTwin-Platform/RoboTwin" target="_blank">Code</a>
+              <a class="pub-link" href="https://robotwin-platform.github.io/doc/" target="_blank">Document</a>
+            </div>
+          </div>
+        </li>
+        <li class="pub-item">
+          <div class="pub-thumb"><img src="assets/work/ddvla.jpg" alt="Discrete Diffusion VLA" loading="lazy" /></div>
+          <div class="pub-body">
+            <div class="pub-title">Discrete Diffusion VLA: Bringing Discrete Diffusion to Action Decoding in Vision-Language-Action Policies</div>
+            <div class="pub-authors">Zhixuan Liang, Yizhuo Li, Tianshuo Yang, Chengyue Wu, Sitong Mao, Liuao Pei, <span class="self">Tian Nian</span>, Shunbo Zhou, Xiaokang Yang, Jiangmiao Pang, Yao Mu, Ping Luo</div>
+            <div class="pub-venue"><span class="venue-name">ICML 2026</span> <span class="venue-rank">CCF-A</span></div>
+            <div class="pub-links">
+              <a class="pub-link" href="https://arxiv.org/pdf/2508.20072" target="_blank">Paper</a>
+              <a class="pub-link" href="https://arxiv.org/abs/2508.20072" target="_blank">arXiv</a>
+            </div>
+          </div>
+        </li>
+        <li class="pub-item">
+          <div class="pub-thumb"><img src="assets/work/adamoe.jpg" alt="AdaMoE" loading="lazy" /></div>
+          <div class="pub-body">
+            <div class="pub-title">Expertise need not monopolize: Action-Specialized Mixture of Experts for Vision-Language-Action Learning</div>
+            <div class="pub-authors">Weijie Shen, Yitian Liu, Yuhao Wu, Zhixuan Liang, Sijia Gu, Dehui Wang, <span class="self">Tian Nian</span>, Lei Xu, Yusen Qin, Jiangmiao Pang, Xinping Guan, Xiaokang Yang, Yao Mu</div>
+            <div class="pub-venue"><span class="venue-name">arXiv 2025</span> <span class="venue-rank">· Preprint</span></div>
+            <div class="pub-links">
+              <a class="pub-link" href="https://arxiv.org/pdf/2510.14300" target="_blank">Paper</a>
+              <a class="pub-link" href="https://arxiv.org/abs/2510.14300" target="_blank">arXiv</a>
+            </div>
+          </div>
+        </li>
+        <li class="pub-item">
+          <div class="pub-thumb"><img src="assets/work/2025-robotwin-challenge.jpg" alt="RoboTwin Challenge" loading="lazy" /></div>
+          <div class="pub-body">
+            <div class="pub-title">Benchmarking Generalizable Bimanual Manipulation: RoboTwin Dual-Arm Collaboration Challenge at CVPR 2025 MEIS Workshop</div>
+            <div class="pub-authors">Tianxing Chen*, Kaixuan Wang*, Zhaohui Yang*, Yuhao Zhang*, Zanxin Chen*, Baijun Chen*, Wanxi Dong*, Ziyuan Liu, Dong Chen, Tianshuo Yang, Haibao Yu, Xiaokang Yang, Yusen Qin, Zhiqiang Xie, Yao Mu†, Ping Luo†, <span class="self">Tian Nian</span>, Weiliang Deng, Yiheng Ge, Yibin Liu, Zixuan Li, Dehui Wang, Zhixuan Liang, and All Competition Volunteers and Participants</div>
+            <div class="pub-venue"><span class="venue-name">Technical Report</span> <span class="venue-rank">· CVPR 2025 MEIS Workshop</span></div>
+            <div class="pub-links">
+              <a class="pub-link" href="https://robotwin-benchmark.github.io/cvpr-2025-challenge/" target="_blank">Project Page</a>
+              <a class="pub-link" href="https://arxiv.org/abs/2506.23351" target="_blank">arXiv</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <p class="pub-footnote">* Equal contribution / Core lead author. † Corresponding author. § Project lead. Full list on <a href="https://scholar.google.com/citations?user=V555uv8AAAAJ&hl=zh-CN" target="_blank">Google Scholar →</a></p>
+  </div>
+</section>
+
+<!-- ================= OPEN SOURCE ================= -->
+<section class="block" id="opensource">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 class="sec-title">Open Source</h2>
+    </div>
+    <ul class="oss-list reveal">
+      <li class="oss-item">
+        <div class="proj-meta">Creator &amp; Maintainer</div>
+        <div class="proj-name"><a href="https://github.com/Tian-Nian/control_your_robot" target="_blank">control_your_robot</a></div>
+        <div class="proj-desc">A ready-to-use pipeline for real-robot research: robotic arm control, teleoperation, data collection, and VLA training &amp; deployment. Supports Piper, RealMan, ALOHA and more.</div>
+        <div class="oss-badges">
+          <img alt="GitHub stars" src="https://img.shields.io/github/stars/Tian-Nian/control_your_robot?style=social" />
+          <img alt="GitHub forks" src="https://img.shields.io/github/forks/Tian-Nian/control_your_robot?style=social" />
+        </div>
+      </li>
+      <li class="oss-item">
+        <div class="proj-meta">Core Lead Author</div>
+        <div class="proj-name"><a href="https://github.com/XPolicyLab/XPolicyLab" target="_blank">XPolicyLab</a></div>
+        <div class="proj-desc">A unified standard for robot policy evaluation and deployment, connecting 60+ policies to benchmarks and real robots. IROS 2026 ScaleInfra Best Tool Paper.</div>
+        <div class="oss-badges">
+          <img alt="GitHub stars" src="https://img.shields.io/github/stars/XPolicyLab/XPolicyLab?style=social" />
+          <img alt="GitHub forks" src="https://img.shields.io/github/forks/XPolicyLab/XPolicyLab?style=social" />
+        </div>
+      </li>
+      <li class="oss-item">
+        <div class="proj-meta">Contributor</div>
+        <div class="proj-name"><a href="https://github.com/RoboTwin-Platform/RoboTwin" target="_blank">RoboTwin</a></div>
+        <div class="proj-desc">Bimanual robotic manipulation platform with scalable data generation and a 50-task benchmark. RoboTwin 2.0 accepted to ICML 2026.</div>
+        <div class="oss-badges">
+          <img alt="GitHub stars" src="https://img.shields.io/github/stars/RoboTwin-Platform/RoboTwin?style=social" />
+          <img alt="GitHub forks" src="https://img.shields.io/github/forks/RoboTwin-Platform/RoboTwin?style=social" />
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>© Tian Nian · 粘天 · Latest updated Oct. 2026 · Design adapted from <a href="https://tianxingchen.github.io" target="_blank">Tianxing Chen</a></span>
+    <a href="https://visitorbadge.io/status?path=https%3A%2F%2Ftian-nian.github.io%2F"><img src="https://api.visitorbadge.io/api/combined?path=https%3A%2F%2Ftian-nian.github.io%2F&labelColor=%232ccce4&countColor=%230158f9" alt="visitors" /></a>
+  </div>
+</footer>
+
+<script>
+  // Compact author lists: keep starred (*), corresponding (†), project lead (§) and self; hide the rest as "..."
+  class PubAuthorsCompact {
+    static shouldKeep(html) {
+      if (/class=["'][^"']*\bself\b/.test(html)) return true;
+      return /[*†§]/.test(html.replace(/<[^>]+>/g, ''));
+    }
+    static buildShort(raw) {
+      const out = [];
+      let pending = false;
+      raw.split(/,\s*/).map(t => t.trim()).filter(Boolean).forEach(token => {
+        if (this.shouldKeep(token)) {
+          if (pending) { out.push('<span class="authors-ellipsis">...</span>'); pending = false; }
+          out.push(token);
+        } else {
+          pending = true;
+        }
+      });
+      if (pending) out.push('<span class="authors-ellipsis">...</span>');
+      return out.join(', ');
+    }
+    static render(el, expanded) {
+      el.classList.toggle('is-detailed', expanded);
+      el.innerHTML = (expanded ? el.dataset.full : el.dataset.short) +
+        ` <button type="button" class="pub-authors-detail-btn">${expanded ? 'Hide detailed author list' : 'Detailed author list'}</button>`;
+      el.querySelector('.pub-authors-detail-btn').addEventListener('click', () => this.render(el, !expanded));
+    }
+    static compact(el) {
+      const raw = el.innerHTML.trim();
+      if (raw.split(',').length <= 20) return;
+      const shortHtml = this.buildShort(raw);
+      if (!shortHtml.includes('authors-ellipsis')) return;
+      el.dataset.full = raw;
+      el.dataset.short = shortHtml;
+      this.render(el, false);
+    }
+    static init() { document.querySelectorAll('.pub-authors').forEach(el => this.compact(el)); }
+  }
+
+  // Highlight papers where self is first / co-first (*) / corresponding (†) author
+  document.querySelectorAll('.pub-item').forEach(item => {
+    const authors = item.querySelector('.pub-authors');
+    const self = authors?.querySelector('.self');
+    if (!self) return;
+    const mark = self.textContent || '';
+    let prefix = '';
+    for (const node of authors.childNodes) {
+      if (node === self) break;
+      prefix += node.textContent || '';
+    }
+    if (prefix.replace(/[,;\s&]+/g, '') === '' || mark.includes('*') || mark.includes('†')) {
+      item.classList.add('pub-item--lead');
+    }
+  });
+
+  PubAuthorsCompact.init();
+
+  // Scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Mobile nav toggle
+  (function () {
+    const nav = document.getElementById('nav');
+    const toggle = document.getElementById('nav-toggle');
+    const links = document.getElementById('nav-links');
+    const setOpen = open => {
+      nav.classList.toggle('is-open', open);
+      document.body.classList.toggle('nav-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 860) setOpen(false); }, { passive: true });
+  })();
+
+  // Active nav link
+  (function () {
+    const links = [...document.querySelectorAll('.nav-links a[href^="#"]')];
+    const map = links.map(a => ({ a, el: document.getElementById(a.getAttribute('href').slice(1)) })).filter(x => x.el);
+    const setActive = () => {
+      const y = window.scrollY + 56 + 28;
+      let cur = map[0].a;
+      for (const item of map) {
+        if (item.el.getBoundingClientRect().top + window.scrollY <= y) cur = item.a;
+      }
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8) cur = map[map.length - 1].a;
+      links.forEach(a => a.classList.toggle('is-active', a === cur));
+    };
+    window.addEventListener('scroll', setActive, { passive: true });
+    window.addEventListener('resize', setActive, { passive: true });
+    setActive();
+  })();
+
+  // Featured media lightbox
+  (function () {
+    const box = document.getElementById('pub-lightbox');
+    const stage = document.getElementById('pub-lightbox-stage');
+    const caption = document.getElementById('pub-lightbox-caption');
+    const close = () => {
+      box.classList.remove('is-open');
+      box.setAttribute('aria-hidden', 'true');
+      stage.innerHTML = '';
+      document.body.style.overflow = '';
+    };
+    document.querySelectorAll('.pub-featured-trigger').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const { mediaType, src, playbackRate } = btn.dataset;
+        if (mediaType === 'video') {
+          const v = document.createElement('video');
+          Object.assign(v, { src, controls: true, autoplay: true, loop: true, muted: true, playsInline: true });
+          v.addEventListener('loadedmetadata', () => { v.playbackRate = parseFloat(playbackRate || '1'); });
+          stage.replaceChildren(v);
+        } else {
+          const img = document.createElement('img');
+          img.src = src;
+          stage.replaceChildren(img);
+        }
+        caption.textContent = btn.dataset.caption || '';
+        box.classList.add('is-open');
+        box.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    box.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', close));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && box.classList.contains('is-open')) close(); });
+  })();
+</script>
+</body>
+</html>
